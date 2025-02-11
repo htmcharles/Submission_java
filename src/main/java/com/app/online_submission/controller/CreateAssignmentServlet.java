@@ -1,10 +1,8 @@
 package com.app.online_submission.controller;
 
 import com.app.online_submission.model.Assignment;
-import com.app.online_submission.model.Course;
 import com.app.online_submission.model.User;
 import com.app.online_submission.service.AssignmentService;
-import com.app.online_submission.service.CourseService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -23,8 +21,18 @@ public class CreateAssignmentServlet extends HttpServlet {
         AssignmentService assignmentService = AssignmentService.getInstance();
         List<Assignment> assignments = assignmentService.getAllAssignmentsByInstructor(instructor);
 
+        // Troubleshooting: Log the assignment list size or null check in the terminal
+        if (assignments == null) {
+            System.out.println("Assignments list is null.");
+        } else if (assignments.isEmpty()) {
+            System.out.println("Assignments list is empty.");
+        } else {
+            System.out.println("Assignments found: " + assignments.size());
+        }
+
+        // Pass assignments to the JSP
         request.setAttribute("assignments", assignments);
-        request.getRequestDispatcher("WEB-INF/teacher_dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("teacher_dashboard.jsp").forward(request, response);
     }
 
     @Override
@@ -48,17 +56,12 @@ public class CreateAssignmentServlet extends HttpServlet {
         // Get the logged-in user (instructor)
         User instructor = (User) session.getAttribute("user");
 
-        // Fetch the course by its ID (added CourseService to handle this)
-        CourseService courseService = new CourseService();
-        Course course = courseService.getCourseById(courseId);
-
         // Create a new assignment object
         Assignment assignment = new Assignment();
         assignment.setTitle(title);
         assignment.setDescription(description);
         assignment.setDeadline(deadline);
         assignment.setInstructor(instructor);
-        assignment.setCourse(course);
 
         // Call the AssignmentService to save the assignment
         AssignmentService assignmentService = AssignmentService.getInstance();
