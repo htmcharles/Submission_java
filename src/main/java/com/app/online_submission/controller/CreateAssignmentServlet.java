@@ -3,15 +3,29 @@ package com.app.online_submission.controller;
 import com.app.online_submission.model.Assignment;
 import com.app.online_submission.model.Course;
 import com.app.online_submission.model.User;
-import com.app.online_submission.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.app.online_submission.service.AssignmentService;
+import com.app.online_submission.service.CourseService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class CreateAssignmentServlet extends HttpServlet {
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp?error=session_expired");
+            return;
+        }
+        User instructor = (User) session.getAttribute("user");
+        AssignmentService assignmentService = AssignmentService.getInstance();
+        List<Assignment> assignments = assignmentService.getAllAssignmentsByInstructor(instructor);
+
+        request.setAttribute("assignments", assignments);
+        request.getRequestDispatcher("WEB-INF/teacher_dashboard.jsp").forward(request, response);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -26,40 +40,31 @@ public class CreateAssignmentServlet extends HttpServlet {
         String title = request.getParameter("title");
         String description = request.getParameter("description");
         int courseId = Integer.parseInt(request.getParameter("courseId"));
-        LocalDateTime deadline = LocalDateTime.parse(request.getParameter("deadline"));
+        String deadlineStr = request.getParameter("deadline");
+
+        // Validate deadline
+        LocalDateTime deadline = LocalDateTime.parse(deadlineStr);
 
         // Get the logged-in user (instructor)
         User instructor = (User) session.getAttribute("user");
 
-        // Get the SessionFactory and open a session
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session hibernateSession = sessionFactory.openSession();
-        hibernateSession.beginTransaction();
+        // Fetch the course by its ID (added CourseService to handle this)
+        CourseService courseService = new CourseService();
+        Course course = courseService.getCourseById(courseId);
 
-        try {
-            // Get the course based on the courseId (this assumes you have a method to fetch the course)
-            Course course = hibernateSession.get(Course.class, courseId);
+        // Create a new assignment object
+        Assignment assignment = new Assignment();
+        assignment.setTitle(title);
+        assignment.setDescription(description);
+        assignment.setDeadline(deadline);
+        assignment.setInstructor(instructor);
+        assignment.setCourse(course);
 
-            // Create a new Assignment object
-            Assignment assignment = new Assignment();
-            assignment.setTitle(title);
-            assignment.setDescription(description);
-            assignment.setDeadline(deadline);
-            assignment.setInstructor(instructor);
-            assignment.setCourse(course);
+        // Call the AssignmentService to save the assignment
+        AssignmentService assignmentService = AssignmentService.getInstance();
+        assignmentService.addAssignment(assignment);
 
-            // Save the assignment to the database
-            hibernateSession.persist(assignment);
-            hibernateSession.getTransaction().commit();
-
-            // Redirect back to the teacher dashboard with success message
-            response.sendRedirect("teacher_dashboard.jsp?message=Assignment%20created%20successfully");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("error.jsp?message=Error%20creating%20assignment");
-        } finally {
-            hibernateSession.close();
-        }
+        // Redirect to teacher dashboard with success message
+        response.sendRedirect("teacher_dashboard.jsp?message=Assignment%20created%20successfully");
     }
 }
