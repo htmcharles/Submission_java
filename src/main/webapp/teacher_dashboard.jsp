@@ -19,46 +19,55 @@
     <title>Teacher Dashboard</title>
 </head>
 <body>
-<h2>Welcome, Teacher</h2>
 
-<!-- View Student Submissions -->
-<h3>Student Submissions</h3>
+<h2>Teacher Dashboard</h2>
+<a href="logout.jsp">Logout</a>
+
+<h3>Create New Assignment</h3>
+<form action="createAssignment" method="post">
+    <label for="title">Assignment Title:</label><br>
+    <input type="text" id="title" name="title" required><br><br>
+
+    <label for="description">Description:</label><br>
+    <textarea id="description" name="description"></textarea><br><br>
+
+    <label for="courseId">Select Course:</label><br>
+    <select id="courseId" name="courseId">
+        <%-- Populate this list with courses from the database --%>
+        <option value="1">Course 1</option>
+        <option value="2">Course 2</option>
+    </select><br><br>
+
+    <label for="deadline">Deadline:</label><br>
+    <input type="datetime-local" id="deadline" name="deadline" required><br><br>
+
+    <button type="submit">Create Assignment</button>
+</form>
+
+<h3>Manage Assignments</h3>
 <ul>
     <%
-        List<Assignment> submissions = (List<Assignment>) request.getAttribute("submissions");
-        if (submissions != null) {
-            for (Assignment submission : submissions) {
+        List<Assignment> assignments = (List<Assignment>) request.getAttribute("assignments");
+        if (assignments != null && !assignments.isEmpty()) {
+            for (Assignment assignment : assignments) {
     %>
     <li>
-        <%= submission.getStudentName() %> - <%= submission.getSubject() %>
-        <a href="download?file=<%= submission.getFilePath() %>">Download</a>
+        <strong>Course:</strong> <%= assignment.getCourse().getName() %><br>
+        <strong>Title:</strong> <%= assignment.getTitle() %><br>
+        <strong>Deadline:</strong> <%= assignment.getDeadline() %><br>
+        <strong>Description:</strong> <%= assignment.getDescription() != null ? assignment.getDescription() : "No description" %><br>
+        <a href="viewSubmissions?assignmentId=<%= assignment.getId() %>">View Submissions</a>
     </li>
+    <hr>
     <%
         }
     } else {
     %>
-    <li>No submissions available.</li>
+    <li>No assignments created yet.</li>
     <%
         }
     %>
 </ul>
 
-<!-- Grade Assignments -->
-<h3>Grade Assignment</h3>
-<form action="gradeAssignment" method="POST">
-    <label for="student">Student Name:</label><br>
-    <input type="text" name="student" id="student" required><br><br>
-
-    <label for="subject">Subject:</label><br>
-    <input type="text" name="subject" id="subject" required><br><br>
-
-    <label for="grade">Grade:</label><br>
-    <input type="text" name="grade" id="grade" required><br><br>
-
-    <button type="submit">Submit Grade</button>
-</form>
-
-<br>
-<a href="logout.jsp">Logout</a>
 </body>
 </html>
