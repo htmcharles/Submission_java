@@ -27,9 +27,6 @@ public class Assignment {
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
-    private User student;
 
     @Column(name = "file_path")
     private String filePath;
@@ -80,16 +77,9 @@ public class Assignment {
         return instructor;
     }
 
+
     public void setInstructor(User instructor) {
         this.instructor = instructor;
-    }
-
-    public User getStudent() {
-        return student;
-    }
-
-    public void setStudent(User student) {
-        this.student = student;
     }
 
     public String getFilePath() {
@@ -100,10 +90,6 @@ public class Assignment {
         this.filePath = filePath;
     }
 
-    // New method to get the student's name
-    public String getStudentName() {
-        return student != null ? student.getUsername() : null;  // Assuming getName() is a method in the User class
-    }
 
     // New method to get the subject from the course
     public String getSubject() {
