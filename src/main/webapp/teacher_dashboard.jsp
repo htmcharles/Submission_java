@@ -24,7 +24,7 @@
 <a href="logout.jsp">Logout</a>
 
 <h3>Create New Assignment</h3>
-<form action="createAssignment" method="post">
+<form action="CreateAssignmentServlet" method="post">
     <label for="title">Assignment Title:</label><br>
     <input type="text" id="title" name="title" required><br><br>
 
@@ -33,7 +33,7 @@
 
     <label for="courseId">Select Course:</label><br>
     <select id="courseId" name="courseId">
-        <%-- Populate this list with courses from the database --%>
+        <%-- Populate this list dynamically with courses from the database --%>
         <option value="1">Course 1</option>
         <option value="2">Course 2</option>
     </select><br><br>
@@ -52,7 +52,7 @@
             for (Assignment assignment : assignments) {
     %>
     <li>
-        <strong>Course:</strong> <%= assignment.getCourse().getName() %><br>
+        <strong>Course:</strong> <%= assignment.getCourse() != null ? assignment.getCourse().getName() : "N/A" %><br>
         <strong>Title:</strong> <%= assignment.getTitle() %><br>
         <strong>Deadline:</strong> <%= assignment.getDeadline() %><br>
         <strong>Description:</strong> <%= assignment.getDescription() != null ? assignment.getDescription() : "No description" %><br>
