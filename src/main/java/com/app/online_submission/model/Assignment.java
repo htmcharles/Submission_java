@@ -1,7 +1,6 @@
 package com.app.online_submission.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,6 +26,15 @@ public class Assignment {
     @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
+
+    @Column(name = "file_path")
+    private String filePath;
+
+    // Getter and Setter methods
 
     public int getId() {
         return id;
@@ -74,5 +82,31 @@ public class Assignment {
 
     public void setInstructor(User instructor) {
         this.instructor = instructor;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    // New method to get the student's name
+    public String getStudentName() {
+        return student != null ? student.getUsername() : null;  // Assuming getName() is a method in the User class
+    }
+
+    // New method to get the subject from the course
+    public String getSubject() {
+        return course != null ? course.getDescription() : null;  // Assuming getSubject() is a method in the Course class
     }
 }
