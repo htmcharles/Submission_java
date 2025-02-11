@@ -29,12 +29,15 @@ public class AssignmentService {
 
     public List<Assignment> getAllAssignmentsByInstructor(String instructor) {
         try (Session session = sessionFactory.openSession()) {
-            List<Assignment> assignments = session.createQuery(
+            System.out.println("Fetching assignments for instructor: " + instructor); // Add this line
+            return session.createQuery(
                             "FROM Assignment a WHERE a.instructor = :instructor", Assignment.class)
                     .setParameter("instructor", instructor)
                     .list();
-            System.out.println("Fetched assignments: " + assignments.size()); // Debugging line
-            return assignments;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error fetching assignments for instructor", e); // Add this line for better debugging
         }
     }
+
 }
