@@ -62,6 +62,7 @@ public class CreateAssignmentServlet extends HttpServlet {
         assignment.setDescription(description);
         assignment.setDeadline(deadline);
         assignment.setInstructor(instructor);
+        assignment.setCourse(course); // Set the course
 
         // Call the AssignmentService to save the assignment
         AssignmentService assignmentService = AssignmentService.getInstance();
