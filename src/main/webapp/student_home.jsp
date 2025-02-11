@@ -1,19 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.app.online_submission.model.Assignment" %>
-<%@ page import="jakarta.servlet.http.HttpSession" %>
-
-<%
-    // Check if session exists and if user is logged in
-    HttpSession sessionObj = request.getSession(false);
-    if (sessionObj == null || sessionObj.getAttribute("user") == null) {
-        response.sendRedirect("login.jsp?error=session_expired");
-        return;
-    }
-
-    // Retrieve the list of assignments passed from the servlet
-    List<Assignment> assignments = (List<Assignment>) request.getAttribute("assignments");
-%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,10 +24,11 @@
     <button type="submit">Upload</button>
 </form>
 
-<!-- View Submitted Assignments Section -->
-<h3>Submitted Assignments</h3>
+<!-- View Available Assignments Section -->
+<h3>Available Assignments</h3>
 <ul>
     <%
+        List<Assignment> assignments = (List<Assignment>) request.getAttribute("assignments");
         if (assignments != null && !assignments.isEmpty()) {
             for (Assignment assignment : assignments) {
     %>
@@ -53,18 +41,10 @@
         }
     } else {
     %>
-    <li>No assignments found.</li>
+    <li>No assignments available.</li>
     <%
         }
     %>
-</ul>
-
-<!-- Check Deadlines Section (if needed) -->
-<h3>Assignment Deadlines</h3>
-<ul>
-    <!-- Example static data; replace with actual dynamic data if needed -->
-    <li>Math Assignment - Due: 2025-02-20</li>
-    <li>Science Project - Due: 2025-02-25</li>
 </ul>
 
 <br>
