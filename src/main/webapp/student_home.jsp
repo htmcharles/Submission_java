@@ -1,14 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.app.online_submission.model.Assignment" %>
+<%@ page import="com.app.online_submission.model.Course" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 
 <%
     HttpSession sessionObj = request.getSession(false);
     if (sessionObj == null || sessionObj.getAttribute("user") == null) {
-        response.sendRedirect("login.jsp?error=session_expired");
+        response.sendRedirect("login.jsp");
         return;
     }
+
+    List<Assignment> assignments = (List<Assignment>) request.getAttribute("assignments");
 %>
 
 <!DOCTYPE html>
@@ -19,47 +22,46 @@
     <title>Student Dashboard</title>
 </head>
 <body>
-<h2>Welcome, Student</h2>
 
-<!-- Upload Assignment -->
-<h3>Upload Assignment</h3>
-<form action="uploadAssignment" method="POST" enctype="multipart/form-data">
-    <label for="file">Select File:</label><br>
-    <input type="file" name="file" id="file" required><br><br>
+<h2>Student Dashboard</h2>
+<a href="logout.jsp">Logout</a>
 
-    <label for="subject">Subject:</label><br>
-    <input type="text" name="subject" id="subject" required><br><br>
-
-    <button type="submit">Upload</button>
-</form>
-
-<!-- View Submitted Assignments -->
-<h3>Submitted Assignments</h3>
+<h3>Uploaded Assignments</h3>
 <ul>
     <%
-        List<Assignment> assignments = (List<Assignment>) request.getAttribute("assignments");
-        if (assignments != null) {
+        if (assignments != null && !assignments.isEmpty()) {
             for (Assignment assignment : assignments) {
     %>
-    <li><%= assignment.getSubject() %> - Uploaded on <%= assignment.getUploadDate() %></li>
+    <li>
+        <strong>Course:</strong> <%= assignment.getCourse().getName() %><br>
+        <strong>Title:</strong> <%= assignment.getTitle() %><br>
+        <strong>Deadline:</strong> <%= assignment.getDeadline() %><br>
+        <strong>Description:</strong> <%= assignment.getDescription() != null ? assignment.getDescription() : "No description" %>
+    </li>
+    <hr>
     <%
         }
     } else {
     %>
-    <li>No assignments submitted yet.</li>
+    <li>No assignments uploaded yet.</li>
     <%
         }
     %>
 </ul>
 
-<!-- Check Deadlines -->
-<h3>Assignment Deadlines</h3>
-<ul>
-    <li>Math Assignment - Due: 2025-02-20</li>
-    <li>Science Project - Due: 2025-02-25</li>
-</ul>
+<h3>Upload Assignment</h3>
+<form action="uploadAssignment" method="post" enctype="multipart/form-data">
+    <label for="title">Title:</label><br>
+    <input type="text" id="title" name="title" required><br><br>
 
-<br>
-<a href="logout.jsp">Logout</a>
+    <label for="description">Description:</label><br>
+    <textarea id="description" name="description"></textarea><br><br>
+
+    <label for="file">Select File:</label><br>
+    <input type="file" id="file" name="file" required><br><br>
+
+    <button type="submit">Upload</button>
+</form>
+
 </body>
 </html>
