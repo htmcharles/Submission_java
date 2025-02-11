@@ -1,5 +1,6 @@
 package com.app.online_submission.controller;
 
+import com.app.online_submission.model.Role;
 import com.app.online_submission.model.User;
 import com.app.online_submission.util.HibernateUtil;
 import org.hibernate.Session;
@@ -14,6 +15,12 @@ import java.io.IOException;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
+    // Handle GET request to display login page
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/login.jsp").forward(request, response); // Forward to login.jsp
+    }
+
+    // Handle POST request to process login form
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Retrieve the username and password from the login form
         String username = request.getParameter("username");
@@ -40,11 +47,14 @@ public class LoginServlet extends HttpServlet {
             HttpSession httpSession = request.getSession();
             httpSession.setAttribute("user", user);
 
+            // Print the user's role for troubleshooting
+            System.out.println("Logged in user role: " + user.getRole());
+
             // Check the user's role and redirect to the appropriate page
-            if ("student".equals(user.getRole())) {
-                // Redirect to student-specific page (e.g., home.jsp for students)
+            if (user.getRole().compareTo(Role.valueOf("STUDENT")) == 0){
+                // Redirect to student-specific page (e.g., student_home.jsp for students)
                 response.sendRedirect("student_home.jsp");
-            } else if ("teacher".equals(user.getRole())) {
+            } else if (user.getRole().compareTo(Role.valueOf("TEACHER")) == 0) {
                 // Redirect to teacher-specific page (e.g., teacher_dashboard.jsp for teachers)
                 response.sendRedirect("teacher_dashboard.jsp");
             } else {
