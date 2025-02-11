@@ -3,4 +3,58 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
+
+    <!-- Welcome file list -->
+    <welcome-file-list>
+        <welcome-file>home.jsp</welcome-file> <!-- Redirect to home.jsp by default -->
+    </welcome-file-list>
+
+    <!-- Servlet for handling assignment submission -->
+    <servlet>
+        <servlet-name>SubmitAssignmentServlet</servlet-name>
+        <servlet-class>com.app.online_submission.controller.SubmitAssignmentServlet</servlet-class>
+    </servlet>
+
+    <!-- Mapping for SubmitAssignmentServlet -->
+    <servlet-mapping>
+        <servlet-name>SubmitAssignmentServlet</servlet-name>
+        <url-pattern>/submit_assignment</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for handling student registration -->
+    <servlet>
+        <servlet-name>StudentRegistrationServlet</servlet-name>
+        <servlet-class>com.app.online_submission.controller.StudentRegistrationServlet</servlet-class>
+    </servlet>
+
+    <!-- Mapping for StudentRegistrationServlet -->
+    <servlet-mapping>
+        <servlet-name>StudentRegistrationServlet</servlet-name>
+        <url-pattern>/registration</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for handling login -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.app.online_submission.controller.LoginServlet</servlet-class>
+    </servlet>
+
+    <!-- Mapping for LoginServlet -->
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for handling instructor assignment creation -->
+    <servlet>
+        <servlet-name>CreateAssignmentServlet</servlet-name>
+        <servlet-class>com.app.online_submission.controller.CreateAssignmentServlet</servlet-class>
+    </servlet>
+
+    <!-- Mapping for CreateAssignmentServlet -->
+    <servlet-mapping>
+        <servlet-name>CreateAssignmentServlet</servlet-name>
+        <url-pattern>/create_assignment</url-pattern>
+    </servlet-mapping>
+
 </web-app>
