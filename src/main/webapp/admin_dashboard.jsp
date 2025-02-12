@@ -2,7 +2,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 
-
 <%
     HttpSession sessionObj = request.getSession(false);
     if (sessionObj == null || sessionObj.getAttribute("user") == null) {
@@ -21,6 +20,32 @@
 <body>
 <h2>Admin Dashboard</h2>
 <a href="logout.jsp">Logout</a>
+
+<!-- Display Messages -->
+<c:if test="${not empty successMessage}">
+    <p style="color: green;"><c:out value="${successMessage}" /></p>
+</c:if>
+<c:if test="${not empty errorMessage}">
+    <p style="color: red;"><c:out value="${errorMessage}" /></p>
+</c:if>
+
+<!-- Add User Form -->
+<h3>Add New User</h3>
+<form action="AdminServlet" method="post">
+    <label>Username:</label>
+    <input type="text" name="username" required><br><br>
+
+    <label>Password:</label>
+    <input type="password" name="password" required><br><br>
+
+    <label>Role:</label>
+    <select name="role" required>
+        <option value="STUDENT">Student</option>
+        <option value="TEACHER">Teacher</option>
+    </select><br><br>
+
+    <button type="submit">Add User</button>
+</form>
 
 <!-- View All Assignments -->
 <h3>All Assignments</h3>
