@@ -23,7 +23,7 @@ public class CreateAssignmentServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         // Check if the logged-in user is an instructor
-        if (user instanceof User && user.getRole().equals("INSTRUCTOR")) {
+        if (user instanceof User && user.getRole().equals("TEACHER")) {
             // Fetch assignments for the instructor
             AssignmentService assignmentService = AssignmentService.getInstance();
             List<Assignment> assignments = assignmentService.getAllAssignmentsByInstructor((User) user);
