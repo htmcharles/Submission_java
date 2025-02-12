@@ -91,11 +91,11 @@ public class StudentServlet extends HttpServlet {
             hibernateSession.getTransaction().commit();
 
             // Redirect back to the teacher dashboard with success message
-            response.sendRedirect("CreateAssignmentServlet");
+            response.sendRedirect("StudentServlet");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("CreateAssignmentServlet");
+            response.sendRedirect("StudentServlet");
         }
     }
 
