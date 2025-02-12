@@ -1,13 +1,16 @@
 package com.app.online_submission.controller;
 
 import com.app.online_submission.model.Assignment;
+import com.app.online_submission.model.Course;
 import com.app.online_submission.model.User;
 import com.app.online_submission.service.AssignmentService;
+import com.app.online_submission.util.HibernateUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.hibernate.Session;
 
 public class CreateAssignmentServlet extends HttpServlet {
 
@@ -21,6 +24,12 @@ public class CreateAssignmentServlet extends HttpServlet {
         AssignmentService assignmentService = AssignmentService.getInstance();
         List<Assignment> assignments = assignmentService.getAllAssignmentsByInstructor(instructor);
 
+        // Fetch all courses from the database
+        List<Course> courses;
+        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+            courses = hibernateSession.createQuery("FROM Course", Course.class).list();
+        }
+
         // Troubleshooting: Log the assignment list size or null check in the terminal
         if (assignments == null) {
             System.out.println("Assignments list is null.");
@@ -30,8 +39,9 @@ public class CreateAssignmentServlet extends HttpServlet {
             System.out.println("Assignments found: " + assignments.size());
         }
 
-        // Pass assignments to the JSP
+        // Pass assignments and courses to the JSP
         request.setAttribute("assignments", assignments);
+        request.setAttribute("courses", courses);
         request.getRequestDispatcher("teacher_dashboard.jsp").forward(request, response);
     }
 
@@ -48,27 +58,50 @@ public class CreateAssignmentServlet extends HttpServlet {
         String title = request.getParameter("title");
         String description = request.getParameter("description");
         int courseId = Integer.parseInt(request.getParameter("courseId"));
-        String deadlineStr = request.getParameter("deadline");
-
-        // Validate deadline
-        LocalDateTime deadline = LocalDateTime.parse(deadlineStr);
+        LocalDateTime deadline = LocalDateTime.parse(request.getParameter("deadline"));
 
         // Get the logged-in user (instructor)
         User instructor = (User) session.getAttribute("user");
 
-        // Create a new assignment object
-        Assignment assignment = new Assignment();
-        assignment.setTitle(title);
-        assignment.setDescription(description);
-        assignment.setDeadline(deadline);
-        assignment.setInstructor(instructor);
-        assignment.setCourse(course); // Set the course
+        // Log courseId for debugging
+        System.out.println("Course ID received: " + courseId);
 
-        // Call the AssignmentService to save the assignment
-        AssignmentService assignmentService = AssignmentService.getInstance();
-        assignmentService.addAssignment(assignment);
+        // Get the SessionFactory and open a session
+        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+            hibernateSession.beginTransaction();
 
-        // Redirect to teacher dashboard with success message
-        response.sendRedirect("teacher_dashboard.jsp?message=Assignment%20created%20successfully");
+            // Get the course based on the courseId
+            Course course = hibernateSession.get(Course.class, courseId);
+            if (course == null) {
+                // Log if course is not found
+                System.out.println("Course not found with ID: " + courseId);
+
+                // If course does not exist, send an error response
+                response.sendRedirect("error.jsp?message=Course%20not%20found");
+                return;
+            }
+
+            // Log if course was found successfully
+            System.out.println("Course found: " + course.getName());
+
+            // Create a new Assignment object
+            Assignment assignment = new Assignment();
+            assignment.setTitle(title);
+            assignment.setDescription(description);
+            assignment.setDeadline(deadline);
+            assignment.setInstructor(instructor);
+            assignment.setCourse(course);
+
+            // Save the assignment to the database
+            hibernateSession.persist(assignment);
+            hibernateSession.getTransaction().commit();
+
+            // Redirect back to the teacher dashboard with success message
+            response.sendRedirect("CreateAssignmentServlet");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("CreateAssignmentServlet");
+        }
     }
 }
