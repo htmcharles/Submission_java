@@ -34,9 +34,9 @@
 
     <label for="courseId">Select Course:</label><br>
     <select id="courseId" name="courseId">
-        <%-- Populate this list dynamically with courses from the database --%>
-        <option value="1">Course 1</option>
-        <option value="2">Course 2</option>
+        <c:forEach var="course" items="${courses}">
+            <option value="${course.id}">${course.name}</option>
+        </c:forEach>
     </select><br><br>
 
     <label for="deadline">Deadline:</label><br>
