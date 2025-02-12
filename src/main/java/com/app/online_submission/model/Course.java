@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "courses")
 public class Course {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -12,12 +13,11 @@ public class Course {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = true)
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "instructor_id", nullable = false)
-    private User instructor;
+    @Column(name = "instructor_id", nullable = false)
+    private int instructorId; // Store the instructor's ID as an integer
 
     // Getters and Setters
 
@@ -45,11 +45,11 @@ public class Course {
         this.description = description;
     }
 
-    public User getInstructor() {
-        return instructor;
+    public int getInstructorId() {
+        return instructorId;
     }
 
-    public void setInstructor(User instructor) {
-        this.instructor = instructor;
+    public void setInstructorId(int instructorId) {
+        this.instructorId = instructorId;
     }
 }
