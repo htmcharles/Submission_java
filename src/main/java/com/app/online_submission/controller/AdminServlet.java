@@ -50,43 +50,72 @@ public class AdminServlet extends HttpServlet {
         String courseDescription = request.getParameter("courseDescription");
         String instructorIdString = request.getParameter("instructorId");
 
-        if (courseName == null || courseDescription == null || instructorIdString == null) {
-            request.setAttribute("errorMessage", "Invalid input.");
-            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
-            return;
-        }
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String roleString = request.getParameter("role");
 
-        try {
-            // Parse the instructor ID as an integer
-            int instructorId = Integer.parseInt(instructorIdString);
-
-            // Check if the instructor exists and is valid
-            User instructor = getInstructorById(instructorId);
-            if (instructor == null || !instructor.getRole().equals(Role.TEACHER)) {
-                request.setAttribute("errorMessage", "Invalid instructor.");
+        // Handle adding a user
+        if (username != null && password != null && roleString != null) {
+            Role role;
+            try {
+                role = Role.valueOf(roleString); // Convert the role string to Role enum
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("errorMessage", "Invalid role.");
                 request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
                 return;
             }
 
-            // Create a new course and set the instructorId
-            Course newCourse = new Course();
-            newCourse.setName(courseName);
-            newCourse.setDescription(courseDescription);
-            newCourse.setInstructorId(instructorId); // Set instructor_id directly
+            // Create and persist new user
+            User newUser = new User();
+            newUser.setUsername(username);
+            newUser.setPassword(password); // Ensure password is hashed in a real-world scenario
+            newUser.setRole(role);
 
-            // Persist the new course in the database
             try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
                 Transaction tx = hibernateSession.beginTransaction();
-                hibernateSession.persist(newCourse);
+                hibernateSession.persist(newUser);
                 tx.commit();
-                request.setAttribute("successMessage", "Course added successfully.");
+                request.setAttribute("successMessage", "User added successfully.");
+            } catch (Exception e) {
+                request.setAttribute("errorMessage", "Error adding user: " + e.getMessage());
             }
-
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Instructor ID must be a valid number.");
+            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+            return;
         }
 
-        request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+        // Handle adding a course
+        if (courseName != null && courseDescription != null && instructorIdString != null) {
+            try {
+                int instructorId = Integer.parseInt(instructorIdString);
+
+                // Check if the instructor exists and is valid
+                User instructor = getInstructorById(instructorId);
+                if (instructor == null || !instructor.getRole().equals(Role.TEACHER)) {
+                    request.setAttribute("errorMessage", "Invalid instructor.");
+                    request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+                    return;
+                }
+
+                // Create a new course and set the instructorId
+                Course newCourse = new Course();
+                newCourse.setName(courseName);
+                newCourse.setDescription(courseDescription);
+                newCourse.setInstructorId(instructorId); // Set instructor_id directly
+
+                // Persist the new course in the database
+                try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+                    Transaction tx = hibernateSession.beginTransaction();
+                    hibernateSession.persist(newCourse);
+                    tx.commit();
+                    request.setAttribute("successMessage", "Course added successfully.");
+                }
+
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorMessage", "Instructor ID must be a valid number.");
+            }
+
+            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+        }
     }
 
     private User getInstructorById(int instructorId) {
