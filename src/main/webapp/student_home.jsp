@@ -40,13 +40,7 @@
                     <td><c:out value="${assignment.id}"/></td>
                     <td><c:out value="${assignment.title}"/></td>
                     <td><c:out value="${assignment.description}"/></td>
-                    <td>
-                        <c:forEach var="course" items="${courses}">
-                            <c:if test="${course.id == assignment.course.id}">
-                                <c:out value="${course.name}"/>
-                            </c:if>
-                        </c:forEach>
-                    </td>
+                    <td><c:out value="${assignment.course_id}"/></td>
                     <td><c:out value="${assignment.deadline}"/></td>
                 </tr>
             </c:forEach>
