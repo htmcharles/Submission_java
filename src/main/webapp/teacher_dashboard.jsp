@@ -54,7 +54,6 @@
                 <th>DESCRIPTION</th>
                 <th>COURSE</th>
                 <th>DEADLINE</th>
-                <th>SUBMISSIONS</th>
             </tr>
             <c:forEach var="assignment" items="${assignments}">
                 <tr>
@@ -69,15 +68,6 @@
                         </c:forEach>
                     </td>
                     <td><c:out value="${assignment.deadline}"/></td>
-                    <td>
-                        <c:forEach var="submission" items="${submissions}">
-                            <c:if test="${submission.assignment.id == assignment.id}">
-                                <p>Submission by <c:out value="${submission.student.username}"/> on <c:out value="${submission.submissionTime}"/>
-                                    <br>File: <a href="${submission.filePath}" target="_blank">View File</a>
-                                </p>
-                            </c:if>
-                        </c:forEach>
-                    </td>
                 </tr>
             </c:forEach>
         </table>
@@ -86,6 +76,33 @@
         <li>No assignments created yet.</li>
     </c:if>
 </ul>
+
+<h3>Manage Submissions</h3>
+<c:if test="${not empty assignments}">
+    <table>
+        <tr>
+            <th>Assignment ID</th>
+            <th>Student Username</th>
+            <th>Submission Time</th>
+            <th>File</th>
+        </tr>
+        <c:forEach var="assignment" items="${assignments}">
+            <c:forEach var="submission" items="${submissions}">
+                <c:if test="${submission.assignment.id == assignment.id}">
+                    <tr>
+                        <td><c:out value="${assignment.id}"/></td>
+                        <td><c:out value="${submission.student.username}"/></td>
+                        <td><c:out value="${submission.submissionTime}"/></td>
+                        <td><a href="${submission.filePath}" target="_blank">View File</a></td>
+                    </tr>
+                </c:if>
+            </c:forEach>
+        </c:forEach>
+    </table>
+</c:if>
+<c:if test="${empty submissions}">
+    <li>No submissions available.</li>
+</c:if>
 
 </body>
 </html>
