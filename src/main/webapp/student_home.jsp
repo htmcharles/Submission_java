@@ -94,6 +94,6 @@
 </ul>
 
 <br>
-<a href="logout.jsp">Logout</a>
+<a href="logout">Logout</a>
 </body>
 </html>

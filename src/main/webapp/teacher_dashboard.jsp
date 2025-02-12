@@ -21,7 +21,7 @@
 <body>
 
 <h2>Teacher Dashboard</h2>
-<a href="logout.jsp">Logout</a>
+<a href="logout">Logout</a>
 
 <h3>Create New Assignment</h3>
 <form action="TeacherServlet" method="post">

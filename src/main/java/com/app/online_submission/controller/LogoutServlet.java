@@ -2,19 +2,21 @@ package com.app.online_submission.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
+
+    // Handle GET request to log out the user
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Invalidate the session to log out the user
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.invalidate(); // Destroy session
+            session.invalidate();  // Invalidate the session
         }
-        response.sendRedirect("login.jsp?message=logged_out"); // Redirect to login page
+
+        // Redirect to the login page
+        response.sendRedirect("login.jsp");
     }
 }

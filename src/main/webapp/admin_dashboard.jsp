@@ -19,7 +19,7 @@
 </head>
 <body>
 <h2>Admin Dashboard</h2>
-<a href="logout.jsp">Logout</a>
+<a href="logout">Logout</a>
 
 <!-- Display Messages -->
 <c:if test="${not empty successMessage}">
