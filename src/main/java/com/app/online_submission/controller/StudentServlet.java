@@ -17,18 +17,24 @@ import org.hibernate.Session;
 
 public class StudentServlet extends HttpServlet {
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp?error=session_expired");
             return;
         }
+
+        // Get the logged-in student
+        User student = (User) session.getAttribute("user");
+
+        // Retrieve all assignments for display
         List<Assignment> allAssignments;
         try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
             allAssignments = hibernateSession.createQuery("FROM Assignment", Assignment.class).list();
         }
 
-        // Troubleshooting: Log the assignment list size or null check in the terminal
+        // Troubleshooting: Log the assignment list size or null check
         if (allAssignments == null) {
             System.out.println("All assignments list is null.");
         } else if (allAssignments.isEmpty()) {
@@ -37,9 +43,27 @@ public class StudentServlet extends HttpServlet {
             System.out.println("All assignments found: " + allAssignments.size());
         }
 
-        // Pass all assignments to the JSP for student view
+        // Fetch student-specific submissions
+        List<Submission> studentSubmissions;
+        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+            studentSubmissions = hibernateSession.createQuery("FROM Submission WHERE student = :student", Submission.class)
+                    .setParameter("student", student)
+                    .list();
+        }
+
+        // Troubleshooting: Log the submission list size or null check
+        if (studentSubmissions == null) {
+            System.out.println("Student submissions list is null.");
+        } else if (studentSubmissions.isEmpty()) {
+            System.out.println("Student submissions list is empty.");
+        } else {
+            System.out.println("Student submissions found: " + studentSubmissions.size());
+        }
+
+        // Pass all assignments and student submissions to the JSP
         request.setAttribute("assignments", allAssignments);
-        request.getRequestDispatcher("student_home.jsp").forward(request, response);
+        request.setAttribute("submissions", studentSubmissions);
+        request.getRequestDispatcher("student_submissions.jsp").forward(request, response);
     }
 
     @Override
@@ -61,10 +85,10 @@ public class StudentServlet extends HttpServlet {
 
         // Perform necessary checks (e.g., validate file type and size, etc.)
         if (assignmentId != null && studentId != null && filePart != null) {
-            // Assuming you have a method to save the file on the server or in the database
+            // Save the file on the server
             String filePath = saveFile(filePart, fileName);
 
-            // Save the submission record to the database (you should implement this in the service layer)
+            // Save the submission record to the database
             try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
                 hibernateSession.beginTransaction();
 
@@ -77,6 +101,7 @@ public class StudentServlet extends HttpServlet {
                 submission.setStudent(student);
                 submission.setFilePath(filePath);
                 submission.setSubmissionTime(LocalDateTime.now());
+
                 // Save submission
                 hibernateSession.persist(submission);
                 hibernateSession.getTransaction().commit();
