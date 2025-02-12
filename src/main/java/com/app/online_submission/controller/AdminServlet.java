@@ -1,15 +1,13 @@
 package com.app.online_submission.controller;
 
-import com.app.online_submission.model.Assignment;
-import com.app.online_submission.model.Course;
-import com.app.online_submission.model.Submission;
-import com.app.online_submission.model.User;
+import com.app.online_submission.model.*;
 import com.app.online_submission.util.HibernateUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class AdminServlet extends HttpServlet {
 
@@ -45,4 +43,59 @@ public class AdminServlet extends HttpServlet {
         request.setAttribute("courses", allCourses);
         request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String roleString = request.getParameter("role");  // Assuming the role is passed as a parameter
+
+        // Ensure roleString is not null and matches the enum names
+        Role role = null;
+        try {
+            role = Role.valueOf(roleString); // Converts the roleString to Role enum
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("errorMessage", "Invalid role.");
+            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+            return;
+        }
+
+        // Validate input
+        if (username == null || password == null || role == null ||
+                (!role.equals(Role.STUDENT) && !role.equals(Role.TEACHER))) {
+            request.setAttribute("errorMessage", "Invalid input");
+            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+            return;
+        }
+
+        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = hibernateSession.beginTransaction();
+
+            // Check if username already exists
+            List<User> existingUsers = hibernateSession.createQuery("FROM User WHERE username = :username", User.class)
+                    .setParameter("username", username)
+                    .list();
+            if (!existingUsers.isEmpty()) {
+                request.setAttribute("errorMessage", "Username already exists.");
+                request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+                return;
+            }
+
+            // Insert new user
+            User newUser = new User();
+            newUser.setUsername(username);
+            newUser.setPassword(password);
+            newUser.setRole(role);
+
+            hibernateSession.persist(newUser);
+            tx.commit();
+
+            request.setAttribute("successMessage", "User added successfully.");
+        } catch (Exception e) {
+            request.setAttribute("errorMessage", "Error adding user.");
+        }
+
+        request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+    }
+
 }
