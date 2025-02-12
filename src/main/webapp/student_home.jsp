@@ -1,6 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.app.online_submission.model.Assignment" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,26 +26,36 @@
 <!-- View Available Assignments Section -->
 <h3>Available Assignments</h3>
 <ul>
-    <%
-        List<Assignment> assignments = (List<Assignment>) request.getAttribute("assignments");
-        if (assignments != null && !assignments.isEmpty()) {
-            for (Assignment assignment : assignments) {
-    %>
-    <li>
-        <b>Subject:</b> <%= assignment.getTitle() %><br>
-        <b>Description:</b> <%= assignment.getDescription() != null ? assignment.getDescription() : "No description" %><br>
-        <b>Deadline:</b> <%= assignment.getDeadline() %><br>
-    </li>
-    <%
-        }
-    } else {
-    %>
-    <li>No assignments available.</li>
-    <%
-        }
-    %>
+    <c:if test="${not empty assignments}">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>TITLE</th>
+                <th>DESCRIPTION</th>
+                <th>COURSE</th>
+                <th>DEADLINE</th>
+            </tr>
+            <c:forEach var="assignment" items="${assignments}">
+                <tr>
+                    <td><c:out value="${assignment.id}"/></td>
+                    <td><c:out value="${assignment.title}"/></td>
+                    <td><c:out value="${assignment.description}"/></td>
+                    <td>
+                        <c:forEach var="course" items="${courses}">
+                            <c:if test="${course.id == assignment.course.id}">
+                                <c:out value="${course.name}"/>
+                            </c:if>
+                        </c:forEach>
+                    </td>
+                    <td><c:out value="${assignment.deadline}"/></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </c:if>
+    <c:if test="${empty assignments}">
+        <li>No assignments created yet.</li>
+    </c:if>
 </ul>
-
 <br>
 <a href="logout.jsp">Logout</a>
 </body>
