@@ -20,8 +20,6 @@
 </head>
 <body>
 <h2>Admin Dashboard</h2>
-<a href="logout">Logout</a>
-
 <!-- Display Messages -->
 <c:if test="${not empty successMessage}">
     <p style="color: green;"><c:out value="${successMessage}" /></p>
@@ -124,5 +122,6 @@
 <c:if test="${empty submissions}">
     <p>No submissions available.</p>
 </c:if>
+<a href="logout">Logout</a>
 </body>
 </html>
