@@ -1,7 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.app.online_submission.model.Assignment" %>
+
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 
 <%
@@ -53,8 +52,7 @@
                 <th>ID</th>
                 <th>TITLE</th>
                 <th>DESCRIPTION</th>
-                <th>COURSEID</th>
-                <th>INSTRUCTOR</th>
+                <th>COURSE</th>
                 <th>DEADLINE</th>
             </tr>
             <c:forEach var="assignment" items="${assignments}">
@@ -62,8 +60,13 @@
                     <td><c:out value="${assignment.id}"/></td>
                     <td><c:out value="${assignment.title}"/></td>
                     <td><c:out value="${assignment.description}"/></td>
-                    <td><c:out value="${assignment.course.id}"/></td>
-                    <td><c:out value="${assignment.instructor.id}"/></td>
+                    <td>
+                        <c:forEach var="course" items="${courses}">
+                            <c:if test="${course.id == assignment.course.id}">
+                                <c:out value="${course.name}"/>
+                            </c:if>
+                        </c:forEach>
+                    </td>
                     <td><c:out value="${assignment.deadline}"/></td>
                 </tr>
             </c:forEach>

@@ -20,29 +20,53 @@ public class CreateAssignmentServlet extends HttpServlet {
             response.sendRedirect("login.jsp?error=session_expired");
             return;
         }
-        User instructor = (User) session.getAttribute("user");
-        AssignmentService assignmentService = AssignmentService.getInstance();
-        List<Assignment> assignments = assignmentService.getAllAssignmentsByInstructor(instructor);
+        User user = (User) session.getAttribute("user");
 
-        // Fetch all courses from the database
-        List<Course> courses;
-        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
-            courses = hibernateSession.createQuery("FROM Course", Course.class).list();
-        }
+        // Check if the logged-in user is an instructor
+        if (user instanceof User && user.getRole().equals("INSTRUCTOR")) {
+            // Fetch assignments for the instructor
+            AssignmentService assignmentService = AssignmentService.getInstance();
+            List<Assignment> assignments = assignmentService.getAllAssignmentsByInstructor((User) user);
 
-        // Troubleshooting: Log the assignment list size or null check in the terminal
-        if (assignments == null) {
-            System.out.println("Assignments list is null.");
-        } else if (assignments.isEmpty()) {
-            System.out.println("Assignments list is empty.");
+            // Fetch all courses from the database
+            List<Course> courses;
+            try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+                courses = hibernateSession.createQuery("FROM Course", Course.class).list();
+            }
+
+            // Troubleshooting: Log the assignment list size or null check in the terminal
+            if (assignments == null) {
+                System.out.println("Assignments list is null.");
+            } else if (assignments.isEmpty()) {
+                System.out.println("Assignments list is empty.");
+            } else {
+                System.out.println("Assignments found: " + assignments.size());
+            }
+
+            // Pass assignments and courses to the JSP
+            request.setAttribute("assignments", assignments);
+            request.setAttribute("courses", courses);
+            request.getRequestDispatcher("teacher_dashboard.jsp").forward(request, response);
         } else {
-            System.out.println("Assignments found: " + assignments.size());
-        }
+            // If the user is a student, fetch all assignments to display
+            List<Assignment> allAssignments;
+            try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+                allAssignments = hibernateSession.createQuery("FROM Assignment", Assignment.class).list();
+            }
 
-        // Pass assignments and courses to the JSP
-        request.setAttribute("assignments", assignments);
-        request.setAttribute("courses", courses);
-        request.getRequestDispatcher("teacher_dashboard.jsp").forward(request, response);
+            // Troubleshooting: Log the assignment list size or null check in the terminal
+            if (allAssignments == null) {
+                System.out.println("All assignments list is null.");
+            } else if (allAssignments.isEmpty()) {
+                System.out.println("All assignments list is empty.");
+            } else {
+                System.out.println("All assignments found: " + allAssignments.size());
+            }
+
+            // Pass all assignments to the JSP for student view
+            request.setAttribute("assignments", allAssignments);
+            request.getRequestDispatcher("student_home.jsp").forward(request, response);
+        }
     }
 
     @Override
