@@ -63,7 +63,7 @@ public class StudentServlet extends HttpServlet {
         // Pass all assignments and student submissions to the JSP
         request.setAttribute("assignments", allAssignments);
         request.setAttribute("submissions", studentSubmissions);
-        request.getRequestDispatcher("student_submissions.jsp").forward(request, response);
+        request.getRequestDispatcher("student_home.jsp").forward(request, response);
     }
 
     @Override

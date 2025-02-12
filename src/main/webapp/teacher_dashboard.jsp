@@ -54,6 +54,7 @@
                 <th>DESCRIPTION</th>
                 <th>COURSE</th>
                 <th>DEADLINE</th>
+                <th>SUBMISSIONS</th>
             </tr>
             <c:forEach var="assignment" items="${assignments}">
                 <tr>
@@ -68,6 +69,15 @@
                         </c:forEach>
                     </td>
                     <td><c:out value="${assignment.deadline}"/></td>
+                    <td>
+                        <c:forEach var="submission" items="${submissions}">
+                            <c:if test="${submission.assignment.id == assignment.id}">
+                                <p>Submission by <c:out value="${submission.student.username}"/> on <c:out value="${submission.submissionTime}"/>
+                                    <br>File: <a href="${submission.filePath}" target="_blank">View File</a>
+                                </p>
+                            </c:if>
+                        </c:forEach>
+                    </td>
                 </tr>
             </c:forEach>
         </table>
