@@ -1,16 +1,19 @@
 package com.app.online_submission.controller;
 
 import com.app.online_submission.model.Assignment;
-import com.app.online_submission.model.Course;
+import com.app.online_submission.model.Submission;
 import com.app.online_submission.model.User;
 import com.app.online_submission.util.HibernateUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.hibernate.Session;
-
 
 public class StudentServlet extends HttpServlet {
 
@@ -49,54 +52,71 @@ public class StudentServlet extends HttpServlet {
         }
 
         // Get form data
-        String title = request.getParameter("title");
-        String description = request.getParameter("description");
-        int courseId = Integer.parseInt(request.getParameter("courseId"));
-        LocalDateTime deadline = LocalDateTime.parse(request.getParameter("deadline"));
+        String assignmentId = request.getParameter("assignment");
+        String studentId = request.getParameter("studentId");
 
-        // Get the logged-in user (instructor)
-        User instructor = (User) session.getAttribute("user");
+        // Handle file upload
+        Part filePart = request.getPart("file");
+        String fileName = getFileName(filePart);
 
-        // Log courseId for debugging
-        System.out.println("Course ID received: " + courseId);
+        // Perform necessary checks (e.g., validate file type and size, etc.)
+        if (assignmentId != null && studentId != null && filePart != null) {
+            // Assuming you have a method to save the file on the server or in the database
+            String filePath = saveFile(filePart, fileName);
 
-        // Get the SessionFactory and open a session
-        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
-            hibernateSession.beginTransaction();
+            // Save the submission record to the database (you should implement this in the service layer)
+            try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+                hibernateSession.beginTransaction();
 
-            // Get the course based on the courseId
-            Course course = hibernateSession.get(Course.class, courseId);
-            if (course == null) {
-                // Log if course is not found
-                System.out.println("Course not found with ID: " + courseId);
+                Assignment assignment = hibernateSession.get(Assignment.class, Long.parseLong(assignmentId));
+                User student = (User) session.getAttribute("user");
 
-                // If course does not exist, send an error response
-                response.sendRedirect("error.jsp?message=Course%20not%20found");
+                // Create a new submission and set the properties
+                Submission submission = new Submission();
+                submission.setAssignment(assignment);
+                submission.setStudent(student);
+                submission.setFilePath(filePath);
+                submission.setSubmissionTime(LocalDateTime.now());
+                // Save submission
+                hibernateSession.persist(submission);
+                hibernateSession.getTransaction().commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect("StudentServlet?error=submission_failed");
                 return;
             }
 
-            // Log if course was found successfully
-            System.out.println("Course found: " + course.getName());
-
-            // Create a new Assignment object
-            Assignment assignment = new Assignment();
-            assignment.setTitle(title);
-            assignment.setDescription(description);
-            assignment.setDeadline(deadline);
-            assignment.setInstructor(instructor);
-            assignment.setCourse(course);
-
-            // Save the assignment to the database
-            hibernateSession.persist(assignment);
-            hibernateSession.getTransaction().commit();
-
-            // Redirect back to the teacher dashboard with success message
-            response.sendRedirect("StudentServlet");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("StudentServlet");
+            // Redirect back to the student home with success message
+            response.sendRedirect("StudentServlet?success=submission_successful");
+        } else {
+            response.sendRedirect("StudentServlet?error=missing_fields");
         }
     }
 
+    // Utility method to get the file name from the Part object
+    private String getFileName(Part part) {
+        String contentDisposition = part.getHeader("Content-Disposition");
+        for (String cd : contentDisposition.split(";")) {
+            if (cd.trim().startsWith("filename")) {
+                return cd.substring(cd.indexOf("=") + 2, cd.length() - 1);
+            }
+        }
+        return null;
+    }
+
+    // Utility method to save the file to a specific path on the server
+    private String saveFile(Part filePart, String fileName) throws IOException {
+        String uploadDir = getServletContext().getRealPath("/uploads");
+        File uploadDirectory = new File(uploadDir);
+        if (!uploadDirectory.exists()) {
+            uploadDirectory.mkdirs();
+        }
+
+        File file = new File(uploadDir + File.separator + fileName);
+        try (InputStream inputStream = filePart.getInputStream()) {
+            Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return file.getAbsolutePath();
+    }
 }

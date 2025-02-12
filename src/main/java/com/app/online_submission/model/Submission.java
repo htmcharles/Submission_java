@@ -2,6 +2,8 @@ package com.app.online_submission.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "submissions")
 public class Submission {
@@ -23,7 +25,7 @@ public class Submission {
     private String filePath;
 
     @Column(name = "submission_time")
-    private String submissionTime;  // Use Timestamp to store exact time
+    private LocalDateTime submissionTime;  // Use Timestamp to store exact time
 
     // Getters and setters
     public int getId() {
@@ -58,11 +60,11 @@ public class Submission {
         this.filePath = filePath;
     }
 
-    public String getSubmissionTime() {
+    public LocalDateTime getSubmissionTime() {
         return submissionTime;
     }
 
-    public void setSubmissionTime(String submissionTime) {
+    public void setSubmissionTime(LocalDateTime submissionTime) {
         this.submissionTime = submissionTime;
     }
 }

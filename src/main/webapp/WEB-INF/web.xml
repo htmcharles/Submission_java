@@ -12,11 +12,18 @@
     <servlet>
         <servlet-name>StudentServlet</servlet-name>
         <servlet-class>com.app.online_submission.controller.StudentServlet</servlet-class>
+        <multipart-config>
+            <location>C:\Users\charles\Desktop</location>
+            <max-file-size>10485760</max-file-size> <!-- 10MB -->
+            <max-request-size>20971520</max-request-size> <!-- 20MB -->
+            <file-size-threshold>1048576</file-size-threshold> <!-- 1MB -->
+        </multipart-config>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>StudentServlet</servlet-name>
         <url-pattern>/StudentServlet</url-pattern>
+
     </servlet-mapping>
 
 </web-app>
