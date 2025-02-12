@@ -46,6 +46,22 @@
 
     <button type="submit">Add User</button>
 </form>
+<!-- Add Course Form -->
+<h3>Add New Course</h3>
+<form action="AdminServlet" method="post">
+    <label>Course Name:</label>
+    <input type="text" name="courseName" required><br><br>
+
+    <label>Course Description:</label>
+    <textarea name="courseDescription" required></textarea><br><br>
+
+    <label>Instructor ID:</label>
+    <input type="text" name="instructorId" required><br><br>
+
+    <button type="submit">Add Course</button>
+</form>
+
+
 
 <!-- View All Assignments -->
 <h3>All Assignments</h3>

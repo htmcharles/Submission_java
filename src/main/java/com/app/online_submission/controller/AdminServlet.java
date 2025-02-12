@@ -46,56 +46,53 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String roleString = request.getParameter("role");  // Assuming the role is passed as a parameter
+        String courseName = request.getParameter("courseName");
+        String courseDescription = request.getParameter("courseDescription");
+        String instructorIdString = request.getParameter("instructorId");
 
-        // Ensure roleString is not null and matches the enum names
-        Role role = null;
+        if (courseName == null || courseDescription == null || instructorIdString == null) {
+            request.setAttribute("errorMessage", "Invalid input.");
+            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+            return;
+        }
+
         try {
-            role = Role.valueOf(roleString); // Converts the roleString to Role enum
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("errorMessage", "Invalid role.");
-            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
-            return;
-        }
+            // Parse the instructor ID as an integer
+            int instructorId = Integer.parseInt(instructorIdString);
 
-        // Validate input
-        if (username == null || password == null || role == null ||
-                (!role.equals(Role.STUDENT) && !role.equals(Role.TEACHER))) {
-            request.setAttribute("errorMessage", "Invalid input");
-            request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
-            return;
-        }
-
-        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
-            Transaction tx = hibernateSession.beginTransaction();
-
-            // Check if username already exists
-            List<User> existingUsers = hibernateSession.createQuery("FROM User WHERE username = :username", User.class)
-                    .setParameter("username", username)
-                    .list();
-            if (!existingUsers.isEmpty()) {
-                request.setAttribute("errorMessage", "Username already exists.");
+            // Check if the instructor exists and is valid
+            User instructor = getInstructorById(instructorId);
+            if (instructor == null || !instructor.getRole().equals(Role.TEACHER)) {
+                request.setAttribute("errorMessage", "Invalid instructor.");
                 request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
                 return;
             }
 
-            // Insert new user
-            User newUser = new User();
-            newUser.setUsername(username);
-            newUser.setPassword(password);
-            newUser.setRole(role);
+            // Create a new course and set the instructorId
+            Course newCourse = new Course();
+            newCourse.setName(courseName);
+            newCourse.setDescription(courseDescription);
+            newCourse.setInstructorId(instructorId); // Set instructor_id directly
 
-            hibernateSession.persist(newUser);
-            tx.commit();
+            // Persist the new course in the database
+            try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+                Transaction tx = hibernateSession.beginTransaction();
+                hibernateSession.persist(newCourse);
+                tx.commit();
+                request.setAttribute("successMessage", "Course added successfully.");
+            }
 
-            request.setAttribute("successMessage", "User added successfully.");
-        } catch (Exception e) {
-            request.setAttribute("errorMessage", "Error adding user.");
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Instructor ID must be a valid number.");
         }
 
         request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+    }
+
+    private User getInstructorById(int instructorId) {
+        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+            return hibernateSession.get(User.class, instructorId); // Fetch the user by instructor ID
+        }
     }
 
 }
