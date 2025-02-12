@@ -57,6 +57,9 @@ public class LoginServlet extends HttpServlet {
             } else if (user.getRole().compareTo(Role.valueOf("TEACHER")) == 0) {
                 // Redirect to teacher-specific page (e.g., teacher_dashboard.jsp for teachers)
                 response.sendRedirect("TeacherServlet");
+            } else if (user.getRole().compareTo(Role.valueOf("ADMIN")) == 0) {
+                // Redirect to teacher-specific page (e.g., teacher_dashboard.jsp for teachers)
+                response.sendRedirect("AdminServlet");
             } else {
                 // In case the role is not recognized
                 response.sendRedirect("login.jsp?error=invalid_role");
