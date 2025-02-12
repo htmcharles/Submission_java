@@ -27,10 +27,6 @@ public class Assignment {
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
 
-
-    @Column(name = "file_path")
-    private String filePath;
-
     // Getter and Setter methods
 
     public int getId() {
@@ -81,16 +77,6 @@ public class Assignment {
     public void setInstructor(User instructor) {
         this.instructor = instructor;
     }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-
     // New method to get the subject from the course
     public String getSubject() {
         return course != null ? course.getDescription() : null;  // Assuming getSubject() is a method in the Course class

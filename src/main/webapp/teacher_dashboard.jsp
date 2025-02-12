@@ -24,7 +24,7 @@
 <a href="logout.jsp">Logout</a>
 
 <h3>Create New Assignment</h3>
-<form action="CreateAssignmentServlet" method="post">
+<form action="TeacherServlet" method="post">
     <label for="title">Assignment Title:</label><br>
     <input type="text" id="title" name="title" required><br><br>
 

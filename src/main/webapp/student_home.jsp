@@ -11,16 +11,23 @@
 <body>
 <h2>Welcome, Student</h2>
 
-<!-- Upload Assignment Section -->
-<h3>Upload Assignment</h3>
-<form action="uploadAssignment" method="POST" enctype="multipart/form-data">
+<!-- Submit Assignment Section -->
+<h3>Submit Assignment</h3>
+<form action="StudentServlet" method="POST" enctype="multipart/form-data">
+    <label for="assignment">Select Assignment:</label><br>
+    <select name="assignment" id="assignment" required>
+        <c:forEach var="assignment" items="${assignments}">
+            <option value="${assignment.id}"><c:out value="${assignment.title}"/></option>
+        </c:forEach>
+    </select><br><br>
+
+    <label for="studentId">Student ID:</label><br>
+    <input type="text" name="studentId" id="studentId" required><br><br>
+
     <label for="file">Select File:</label><br>
     <input type="file" name="file" id="file" required><br><br>
 
-    <label for="subject">Subject:</label><br>
-    <input type="text" name="subject" id="subject" required><br><br>
-
-    <button type="submit">Upload</button>
+    <button type="submit">Submit</button>
 </form>
 
 <!-- View Available Assignments Section -->
@@ -40,7 +47,7 @@
                     <td><c:out value="${assignment.id}"/></td>
                     <td><c:out value="${assignment.title}"/></td>
                     <td><c:out value="${assignment.description}"/></td>
-                    <td><c:out value="${assignment.course_id}"/></td>
+                    <td><c:out value="${assignment.course.name}"/></td>
                     <td><c:out value="${assignment.deadline}"/></td>
                 </tr>
             </c:forEach>
