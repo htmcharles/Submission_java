@@ -34,7 +34,7 @@
 <h3>Available Assignments</h3>
 <ul>
     <c:if test="${not empty assignments}">
-        <table>
+        <table border="1">
             <tr>
                 <th>ID</th>
                 <th>TITLE</th>
@@ -57,6 +57,42 @@
         <li>No assignments created yet.</li>
     </c:if>
 </ul>
+
+<!-- View Your Submissions Section -->
+<h3>Your Previous Submissions</h3>
+<ul>
+    <c:if test="${not empty submissions}">
+        <table border="1">
+            <tr>
+                <th>Assignment Title</th>
+                <th>Submission Date</th>
+                <th>File Name</th>
+                <th>Status</th>
+            </tr>
+            <c:forEach var="submission" items="${submissions}">
+                <tr>
+                    <td><c:out value="${submission.assignment.title}"/></td>
+                    <td><c:out value="${submission.submissionTime}"/></td>
+                    <td><a href="${submission.filePath}" target="_blank">View File</a></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${submission.submissionTime != null}">
+                                Submitted
+                            </c:when>
+                            <c:otherwise>
+                                Not Submitted
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
+                </tr>
+            </c:forEach>
+        </table>
+    </c:if>
+    <c:if test="${empty submissions}">
+        <li>You haven't submitted any assignments yet.</li>
+    </c:if>
+</ul>
+
 <br>
 <a href="logout.jsp">Logout</a>
 </body>

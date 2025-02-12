@@ -34,12 +34,17 @@ public class TeacherServlet extends HttpServlet {
         }
 
         // Troubleshooting: Log the submission list size or null check
-        if (allSubmissions == null) {
-            System.out.println("All submissions list is null.");
-        } else if (allSubmissions.isEmpty()) {
-            System.out.println("All submissions list is empty.");
+        if (allSubmissions != null && !allSubmissions.isEmpty()) {
+            System.out.println("All submissions found: ");
+            for (Submission submission : allSubmissions) {
+                System.out.println("Submission ID: " + submission.getId() +
+                        ", Assignment Title: " + submission.getAssignment().getTitle() +
+                        ", Student Name: " + submission.getStudent().getUsername() +
+                        ", File Path: " + submission.getFilePath() +
+                        ", Submission Time: " + submission.getSubmissionTime());
+            }
         } else {
-            System.out.println("All submissions found: " + allSubmissions.size());
+            System.out.println("No submissions found.");
         }
 
         // Fetch all courses from the database
