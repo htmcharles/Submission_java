@@ -7,6 +7,7 @@ import com.app.online_submission.util.HibernateUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,25 +26,19 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        // Get the logged-in student
+        String downloadFileId = request.getParameter("download");
+        if (downloadFileId != null) {
+            downloadFile(Long.parseLong(downloadFileId), response);
+            return;
+        }
+
         User student = (User) session.getAttribute("user");
 
-        // Retrieve all assignments for display
         List<Assignment> allAssignments;
         try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
             allAssignments = hibernateSession.createQuery("FROM Assignment", Assignment.class).list();
         }
 
-        // Troubleshooting: Log the assignment list size or null check
-        if (allAssignments == null) {
-            System.out.println("All assignments list is null.");
-        } else if (allAssignments.isEmpty()) {
-            System.out.println("All assignments list is empty.");
-        } else {
-            System.out.println("All assignments found: " + allAssignments.size());
-        }
-
-        // Fetch student-specific submissions
         List<Submission> studentSubmissions;
         try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
             studentSubmissions = hibernateSession.createQuery("FROM Submission WHERE student = :student", Submission.class)
@@ -51,21 +46,26 @@ public class StudentServlet extends HttpServlet {
                     .list();
         }
 
-        // Troubleshooting: Log the submission list size or null check
-        if (studentSubmissions == null) {
-            System.out.println("Student submissions list is null.");
-        } else if (studentSubmissions.isEmpty()) {
-            System.out.println("Student submissions list is empty.");
-        } else {
-            System.out.println("Student submissions found: " + studentSubmissions.size());
-        }
-
-        // Pass all assignments and student submissions to the JSP
         request.setAttribute("assignments", allAssignments);
         request.setAttribute("submissions", studentSubmissions);
         request.getRequestDispatcher("student_home.jsp").forward(request, response);
     }
 
+    private void downloadFile(Long submissionId, HttpServletResponse response) throws IOException {
+        try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+            Submission submission = hibernateSession.get(Submission.class, submissionId);
+            if (submission != null) {
+                File file = new File(submission.getFilePath());
+                if (file.exists()) {
+                    response.setContentType(Files.probeContentType(file.toPath()));
+                    response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+                    try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                        fileInputStream.transferTo(response.getOutputStream());
+                    }
+                }
+            }
+        }
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Get the session and ensure the user is logged in
@@ -145,3 +145,4 @@ public class StudentServlet extends HttpServlet {
         return file.getAbsolutePath();
     }
 }
+
