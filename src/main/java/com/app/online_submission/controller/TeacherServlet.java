@@ -37,6 +37,15 @@ public class TeacherServlet extends HttpServlet {
         List<Submission> allSubmissions;
         try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
             allSubmissions = hibernateSession.createQuery("FROM Submission", Submission.class).list();
+
+            // Check if each submission is late and set the flag
+            for (Submission submission : allSubmissions) {
+                if (submission.getSubmissionTime().isAfter(submission.getAssignment().getDeadline())) {
+                    submission.setLate(true);
+                } else {
+                    submission.setLate(false);
+                }
+            }
         }
 
         List<Course> courses;
@@ -79,6 +88,14 @@ public class TeacherServlet extends HttpServlet {
         int courseId = Integer.parseInt(request.getParameter("courseId"));
         LocalDateTime deadline = LocalDateTime.parse(request.getParameter("deadline"));
         User instructor = (User) session.getAttribute("user");
+
+        // Validate deadline to ensure it's not in the past
+        if (deadline.isBefore(LocalDateTime.now())) {
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            out.println("<script>alert('Late submission not allowed'); window.location='TeacherServlet';</script>");
+            return;
+        }
 
         try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
             hibernateSession.beginTransaction();
