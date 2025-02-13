@@ -132,7 +132,7 @@ public class StudentServlet extends HttpServlet {
 
     // Utility method to save the file to a specific path on the server
     private String saveFile(Part filePart, String fileName) throws IOException {
-        String uploadDir = getServletContext().getRealPath("C:\\Users\\charles\\Desktop");
+        String uploadDir = "C:\\Users\\charles\\Desktop\\work"; // Correct Windows path format
         File uploadDirectory = new File(uploadDir);
         if (!uploadDirectory.exists()) {
             uploadDirectory.mkdirs();
