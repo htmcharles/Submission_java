@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>Welcome, Student</h2>
+<h2>Welcome, ${studentName}</h2> <!-- Show student name dynamically -->
 
 <!-- Submit Assignment Section -->
 <h3>Submit Assignment</h3>
@@ -21,9 +21,6 @@
             <option value="${assignment.id}"><c:out value="${assignment.title}"/></option>
         </c:forEach>
     </select><br><br>
-
-    <label for="studentId">Student ID:</label><br>
-    <input type="text" name="studentId" id="studentId" required><br><br>
 
     <label for="file">Select File:</label><br>
     <input type="file" name="file" id="file" required><br><br>

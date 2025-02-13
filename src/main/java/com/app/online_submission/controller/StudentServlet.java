@@ -48,6 +48,7 @@ public class StudentServlet extends HttpServlet {
 
         request.setAttribute("assignments", allAssignments);
         request.setAttribute("submissions", studentSubmissions);
+        request.setAttribute("studentName", student.getUsername()); // Add student name to the request
         request.getRequestDispatcher("student_home.jsp").forward(request, response);
     }
 
@@ -66,6 +67,7 @@ public class StudentServlet extends HttpServlet {
             }
         }
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Get the session and ensure the user is logged in
@@ -77,14 +79,13 @@ public class StudentServlet extends HttpServlet {
 
         // Get form data
         String assignmentId = request.getParameter("assignment");
-        String studentId = request.getParameter("studentId");
 
         // Handle file upload
         Part filePart = request.getPart("file");
         String fileName = getFileName(filePart);
 
         // Perform necessary checks (e.g., validate file type and size, etc.)
-        if (assignmentId != null && studentId != null && filePart != null) {
+        if (assignmentId != null && filePart != null) {
             // Save the file on the server
             String filePath = saveFile(filePart, fileName);
 
@@ -145,4 +146,3 @@ public class StudentServlet extends HttpServlet {
         return file.getAbsolutePath();
     }
 }
-

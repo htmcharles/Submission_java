@@ -87,7 +87,7 @@
         </tr>
         <c:forEach var="submission" items="${submissions}">
             <tr>
-                <td><c:out value="${submission.assignment.id}"/></td>
+                <td><c:out value="${submission.assignment.title}"/></td>
                 <td><c:out value="${submission.student.username}"/></td>
                 <td><c:out value="${submission.submissionTime}"/></td>
                 <td><a href="StudentServlet?download=${submission.id}">Download</a></td>
