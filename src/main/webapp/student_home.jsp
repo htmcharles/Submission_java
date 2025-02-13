@@ -31,35 +31,6 @@
     <button type="submit">Submit</button>
 </form>
 
-<!-- View Available Assignments Section -->
-<h3>Available Assignments</h3>
-<ul>
-    <c:if test="${not empty assignments}">
-        <table border="1">
-            <tr>
-                <th>ID</th>
-                <th>TITLE</th>
-                <th>DESCRIPTION</th>
-                <th>COURSE</th>
-                <th>DEADLINE</th>
-            </tr>
-            <c:forEach var="assignment" items="${assignments}">
-                <tr>
-                    <td><c:out value="${assignment.id}"/></td>
-                    <td><c:out value="${assignment.title}"/></td>
-                    <td><c:out value="${assignment.description}"/></td>
-                    <td><c:out value="${assignment.course.name}"/></td>
-                    <td><c:out value="${assignment.deadline}"/></td>
-                </tr>
-            </c:forEach>
-        </table>
-    </c:if>
-    <c:if test="${empty assignments}">
-        <li>No assignments created yet.</li>
-    </c:if>
-</ul>
-
-<!-- View Your Submissions Section -->
 <h3>Your Previous Submissions</h3>
 <ul>
     <c:if test="${not empty submissions}">
@@ -67,24 +38,13 @@
             <tr>
                 <th>Assignment Title</th>
                 <th>Submission Date</th>
-                <th>File Name</th>
-                <th>Status</th>
+                <th>Download</th>
             </tr>
             <c:forEach var="submission" items="${submissions}">
                 <tr>
                     <td><c:out value="${submission.assignment.title}"/></td>
                     <td><c:out value="${submission.submissionTime}"/></td>
-                    <td><a href="${submission.filePath}" target="_blank">View File</a></td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${submission.submissionTime != null}">
-                                Submitted
-                            </c:when>
-                            <c:otherwise>
-                                Not Submitted
-                            </c:otherwise>
-                        </c:choose>
-                    </td>
+                    <td><a href="StudentServlet?download=${submission.id}">Download</a></td>
                 </tr>
             </c:forEach>
         </table>

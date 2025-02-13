@@ -1,6 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 
 <%
@@ -78,25 +77,21 @@
 </ul>
 
 <h3>Manage Submissions</h3>
-<c:if test="${not empty assignments}">
+<c:if test="${not empty submissions}">
     <table>
         <tr>
             <th>Assignment ID</th>
             <th>Student Username</th>
             <th>Submission Time</th>
-            <th>File</th>
+            <th>Download</th>
         </tr>
-        <c:forEach var="assignment" items="${assignments}">
-            <c:forEach var="submission" items="${submissions}">
-                <c:if test="${submission.assignment.id == assignment.id}">
-                    <tr>
-                        <td><c:out value="${assignment.id}"/></td>
-                        <td><c:out value="${submission.student.username}"/></td>
-                        <td><c:out value="${submission.submissionTime}"/></td>
-                        <td><a href="${submission.filePath}" target="_blank">View File</a></td>
-                    </tr>
-                </c:if>
-            </c:forEach>
+        <c:forEach var="submission" items="${submissions}">
+            <tr>
+                <td><c:out value="${submission.assignment.id}"/></td>
+                <td><c:out value="${submission.student.username}"/></td>
+                <td><c:out value="${submission.submissionTime}"/></td>
+                <td><a href="StudentServlet?download=${submission.id}">Download</a></td>
+            </tr>
         </c:forEach>
     </table>
 </c:if>
