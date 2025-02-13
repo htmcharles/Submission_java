@@ -1,7 +1,6 @@
 package com.app.online_submission.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +25,9 @@ public class Submission {
 
     @Column(name = "submission_time")
     private LocalDateTime submissionTime;  // Use Timestamp to store exact time
+
+    @Transient
+    private boolean late;  // Add this field to track if the submission is late
 
     // Getters and setters
     public int getId() {
@@ -66,5 +68,13 @@ public class Submission {
 
     public void setSubmissionTime(LocalDateTime submissionTime) {
         this.submissionTime = submissionTime;
+    }
+
+    public boolean isLate() {
+        return late;
+    }
+
+    public void setLate(boolean late) {
+        this.late = late;
     }
 }

@@ -80,9 +80,10 @@
 <c:if test="${not empty submissions}">
     <table>
         <tr>
-            <th>Assignment ID</th>
+            <th>Assignment Title</th>
             <th>Student Username</th>
             <th>Submission Time</th>
+            <th>Status</th> <!-- New column for Status -->
             <th>Download</th>
         </tr>
         <c:forEach var="submission" items="${submissions}">
@@ -90,6 +91,16 @@
                 <td><c:out value="${submission.assignment.title}"/></td>
                 <td><c:out value="${submission.student.username}"/></td>
                 <td><c:out value="${submission.submissionTime}"/></td>
+                <td>
+                    <c:choose>
+                        <c:when test="${submission.late}">
+                            Late Submission
+                        </c:when>
+                        <c:otherwise>
+                            On Time
+                        </c:otherwise>
+                    </c:choose>
+                </td>
                 <td><a href="StudentServlet?download=${submission.id}">Download</a></td>
             </tr>
         </c:forEach>
